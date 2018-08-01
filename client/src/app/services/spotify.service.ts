@@ -6,5 +6,17 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class SpotifyService {
-  private searchUrl: string;
+  constructor(private http: HttpClient) {}
+
+  searchMusic(str: string) {
+    return this.http
+      .post('http://localhost:8080/api/search', { search: str })
+      .pipe(map(res => res));
+  }
+
+  getArtist(str: string) {
+    return this.http
+      .post('http://localhost:8080/api/artist', { artistId: str })
+      .pipe(map(res => res));
+  }
 }

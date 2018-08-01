@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -5,6 +6,7 @@ const cors = require('cors');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const users = require('./routes/user-routes');
+const api = require('./routes/api-routes');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -26,7 +28,8 @@ app.use(cors());
 // Set Static Folder
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// Body Parser Middleware
+// Define middleware here
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Passport Middleware
@@ -36,6 +39,7 @@ app.use(passport.session());
 require('./util/passport')(passport);
 
 app.use('/users', users);
+app.use('/api', api);
 
 // Index Route
 // app.get('/', (req, res) => {
