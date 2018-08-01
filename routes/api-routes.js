@@ -17,19 +17,48 @@ router.post('/search', (req, res) => {
     });
   }
 });
-//6spJzoBNMT8KSiMhaiOj2W
+
 router.post('/artist', (req, res) => {
   const { artistId } = req.body;
-  const params = { type: 'artist', query: artistId, limit: 1 };
 
   spotify
-    .request('https://api.spotify.com/v1/artists/' + artistId)
+    .request(`https://api.spotify.com/v1/artists/${artistId}`)
     .then(data => {
       res.json(data);
     })
     .catch(err => {
       console.log(err);
     });
+});
+
+router.post('/albums', (req, res) => {
+  const { artistId } = req.body;
+
+  if (artistId) {
+    spotify
+      .request(`https://api.spotify.com/v1/artists/${artistId}/albums`)
+      .then(data => {
+        res.json(data.items);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+});
+
+router.post('/album', (req, res) => {
+  const { albumId } = req.body;
+  console.log(albumId);
+  if (albumId) {
+    spotify
+      .request(`https://api.spotify.com/v1/albums/${albumId}`)
+      .then(data => {
+        res.json(data);
+      })
+      .catch(err => {
+        res.json('ERROR');
+      });
+  }
 });
 
 module.exports = router;

@@ -19,4 +19,16 @@ export class SpotifyService {
       .post('http://localhost:8080/api/artist', { artistId: str })
       .pipe(map(res => res));
   }
+
+  getAlbums(str: string) {
+    return this.http
+      .post('http://localhost:8080/api/albums', { artistId: str })
+      .pipe(map(res => res));
+  }
+
+  getAlbum(str: string) {
+    return this.http
+      .post('http://localhost:8080/api/album', { albumId: str })
+      .pipe(map(res => res));
+  }
 }
