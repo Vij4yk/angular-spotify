@@ -48,7 +48,7 @@ router.post('/albums', (req, res) => {
 
 router.post('/album', (req, res) => {
   const { albumId } = req.body;
-  console.log(albumId);
+
   if (albumId) {
     spotify
       .request(`https://api.spotify.com/v1/albums/${albumId}`)

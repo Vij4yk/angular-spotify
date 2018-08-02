@@ -10,6 +10,13 @@ import { SearchComponent } from './components/search/search.component';
 import { HttpClientModule } from '../../node_modules/@angular/common/http';
 import { ArtistComponent } from './components/artist/artist.component';
 import { AlbumComponent } from './components/album/album.component';
+import { LoginComponent } from './components/login/login.component';
+import { SignupComponent } from './components/signup/signup.component';
+
+import { FlashMessagesModule } from 'angular2-flash-messages';
+import { ProfileComponent } from './components/profile/profile.component';
+// import { ValidateService } from './services/validate.service';
+// import { AuthService } from './services/auth.service';
 
 @NgModule({
   declarations: [
@@ -18,9 +25,18 @@ import { AlbumComponent } from './components/album/album.component';
     AboutComponent,
     SearchComponent,
     ArtistComponent,
-    AlbumComponent
+    AlbumComponent,
+    LoginComponent,
+    SignupComponent,
+    ProfileComponent
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    FlashMessagesModule.forRoot()
+  ],
   providers: [],
   bootstrap: [AppComponent]
 })
