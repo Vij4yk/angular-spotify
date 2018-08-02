@@ -7,6 +7,8 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 class valResult {
   success: boolean;
   msg: string;
+  token: string;
+  user: object;
 }
 
 @Component({
@@ -69,6 +71,7 @@ export class SignupComponent implements OnInit {
     this.authService.registerUser(user).subscribe((data: valResult) => {
       console.log(data);
       if (data.success) {
+        this.authService.storeUserData(data.token, data.user);
         this.flashMessage.show('You are now registered and can now login', {
           cssClass: 'alert-success',
           timeout: 3000

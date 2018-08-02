@@ -44,7 +44,9 @@ export class AuthService {
   // Sets auth data at login
   storeUserData(token, user) {
     localStorage.setItem('id_token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('email', user.email);
+    localStorage.setItem('username', user.username);
+    localStorage.setItem('_id', user._id);
     this.authToken = token;
     this.user = user;
   }
@@ -57,9 +59,29 @@ export class AuthService {
 
   // Checks if a user is authed
   loggedIn() {
+    const token = localStorage.getItem('id_token');
     const helper = new JwtHelperService();
-    const isExpired = helper.isTokenExpired(this.authToken);
-    console.log(isExpired);
+    let checkRes;
+
+    // checks for a valid token. this basically runs if token is null
+    if (!token) {
+      return false;
+      // if there is a a value, check it
+    } else {
+      // handles errors. Ex, a fake token is set in localStorage
+      try {
+        const decodedToken = helper.decodeToken(token);
+        const expirationDate = helper.getTokenExpirationDate(token);
+        checkRes = helper.isTokenExpired(token);
+      } catch (err) {
+        return false;
+      }
+      // if isExpired returns false, then the token is valid
+      if (!checkRes) {
+        return true;
+      }
+      return false;
+    }
   }
 
   // Removes auth token, clears localStorage

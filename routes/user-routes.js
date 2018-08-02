@@ -4,19 +4,37 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-// Register
+// Registers a user
 router.post('/register', (req, res, next) => {
+  // sets up the data
   const newUser = new User({
     username: req.body.username,
     email: req.body.email,
     password: req.body.password
   });
 
+  // attempts to create the user
   User.addUser(newUser, (err, user) => {
+    // sends err if there is one
     if (err) {
       res.json({ success: false, msg: 'Failed to register user' });
     } else {
-      res.json({ success: true, msg: 'User registered' });
+      // creates a token to send back to the client
+      const token = jwt.sign({ data: user }, 'secretkey', {
+        expiresIn: 604800 // 1 week
+      });
+      // delete operator didn't work to remove the password.
+      // made new userObj instead
+      const userObj = {};
+      userObj._id = user._id;
+      userObj.email = user.email;
+      userObj.username = user.username;
+      res.json({
+        success: true,
+        msg: 'User registered',
+        token,
+        user: userObj
+      });
     }
   });
 });
