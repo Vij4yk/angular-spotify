@@ -1,3 +1,7 @@
 .thumb-album {
   width: 100%;
 }
+
+.save-song {
+  cursor: pointer;
+}

@@ -1,14 +1,14 @@
 <div class="main-form">
-  <form>
+  <form (submit)="onLoginSubmit()">
     <h2 class="text-primary">Welcome</h2>
     <hr>
     <div class="form-group">
       <label>Email Address</label>
-      <input type="email" class="form-control" name="email" required="required">
+      <input [(ngModel)]="email" type="email" class="form-control" name="email" required="required">
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" class="form-control" name="password" required="required">
+      <input [(ngModel)]="password" type="password" class="form-control" name="password" required="required">
     </div>
     <div class="form-group">
       <button type="submit" class="btn btn-primary btn-block btn-lg">Log In</button>

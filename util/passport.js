@@ -8,14 +8,19 @@ module.exports = function(passport) {
   opts.secretOrKey = 'secretkey';
   passport.use(
     new JwtStrategy(opts, (jwt_payload, done) => {
-      console.log(jwt_payload);
+      // console.log(jwt_payload);
       User.getUserById(jwt_payload.data._id, (err, user) => {
         if (err) {
           return done(err, false);
         }
 
         if (user) {
-          return done(null, user);
+          const userObj = {
+            _id: user._id,
+            username: user.username,
+            email: user.email
+          };
+          return done(null, userObj);
         } else {
           return done(null, false);
         }

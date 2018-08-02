@@ -26,15 +26,17 @@ export class AuthService {
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json');
     return this.http
-      .post('users/authenticate', user, { headers: headers })
+      .post('http://localhost:8080/users/authenticate', user, {
+        headers: headers
+      })
       .pipe(map(res => res));
   }
 
   // Gets a users profile information when authenticated
   getProfile() {
+    const bearer = 'Bearer ' + localStorage.getItem('id_token');
     const headers = new HttpHeaders();
-    this.loadToken();
-    headers.append('Authorization', this.authToken);
+    headers.append('Authorization', bearer);
     headers.append('Content-Type', 'application/json');
     return this.http
       .get('http://localhost:8080/users/profile', { headers: headers })

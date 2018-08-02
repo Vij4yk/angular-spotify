@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Song = require('../models/songs');
 
 // Registers a user
 router.post('/register', (req, res, next) => {
@@ -23,17 +24,16 @@ router.post('/register', (req, res, next) => {
       const token = jwt.sign({ data: user }, 'secretkey', {
         expiresIn: 604800 // 1 week
       });
-      // delete operator didn't work to remove the password.
-      // made new userObj instead
-      const userObj = {};
-      userObj._id = user._id;
-      userObj.email = user.email;
-      userObj.username = user.username;
+
       res.json({
         success: true,
         msg: 'User registered',
         token,
-        user: userObj
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email
+        }
       });
     }
   });
@@ -41,10 +41,10 @@ router.post('/register', (req, res, next) => {
 
 // Authenticate
 router.post('/authenticate', (req, res, next) => {
-  const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
 
-  User.getUserByUsername(username, (err, user) => {
+  User.getUserByEmail(email, (err, user) => {
     if (err) throw err;
     if (!user) {
       return res.json({ success: false, msg: 'User not found' });
@@ -58,10 +58,9 @@ router.post('/authenticate', (req, res, next) => {
         });
         res.json({
           success: true,
-          token: token,
+          token,
           user: {
-            id: user._id,
-            name: user.name,
+            _id: user._id,
             username: user.username,
             email: user.email
           }
@@ -78,8 +77,47 @@ router.get(
   '/profile',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-    res.json({ user: req.user });
+    res.json(req.user);
   }
 );
+
+router.post('/save', (req, res) => {
+  const { userId, song } = req.body;
+  // const SongToSave = new Song(song);
+
+  // checks if the song has been saved by anyone or not
+  Song.find({ spotifyId: song.spotifyId })
+    .then(result => {
+      if (result.length) {
+        User.update(
+          { _id: userId },
+          { $addToSet: { savedSongs: result._id } },
+          { new: true }
+        )
+          .then(savedRes => {
+            if (savedRes.nModified === 1) res.json({ success: 'Song saved' });
+            else res.json({ success: 'Song already saved' });
+          })
+          .catch(err => res.json({ error: err }));
+      } else {
+        Song.create(song)
+          .then(result => {
+            User.update(
+              { _id: userId },
+              { $addToSet: { savedSongs: result._id } },
+              { new: true }
+            )
+              .then(savedRes => {
+                if (savedRes.nModified === 1)
+                  res.json({ success: 'Song saved' });
+                else res.json({ success: 'Song already saved' });
+              })
+              .catch(err => res.json({ error: err }));
+          })
+          .catch(err => res.json({ error: err }));
+      }
+    })
+    .catch(err => console.log(err));
+});
 
 module.exports = router;
