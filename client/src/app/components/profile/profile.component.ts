@@ -59,13 +59,8 @@ export class ProfileComponent implements OnInit {
   deleteSong(songId, spotifyId) {
     const userId = localStorage.getItem('_id');
     this.songsService.deleteSong(userId, songId).subscribe((result: any) => {
-      console.log('asdf', result);
+      // if song was deleted successfully, then removes the song from the page
       if (result.success) {
-        const newPlaylist = this.playlists.filter(a => {
-          console.log(a.spotifyId !== spotifyId);
-          // a.spotifyId !== spotifyId;
-        });
-        // this.playlists = newPlaylist;
         this.playlists.forEach((a, i) => {
           if (a.spotifyId === spotifyId) {
             this.playlists.splice(i, 1);
