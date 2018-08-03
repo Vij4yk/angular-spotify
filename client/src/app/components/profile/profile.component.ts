@@ -2,11 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { SongsService } from '../../services/songs.service';
 
 class Profile {
   _id: string;
   username: string;
   email: string;
+  playlists: playlists;
+}
+
+class playlists {
+  savedSongs: object[];
 }
 
 @Component({
@@ -18,10 +24,11 @@ export class ProfileComponent implements OnInit {
   _id: string;
   username: string;
   email: string;
-  playlists: object[];
+  playlists: any;
 
   constructor(
     private authService: AuthService,
+    private songsService: SongsService,
     private router: Router,
     private flashMessage: FlashMessagesService
   ) {}
@@ -29,11 +36,11 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.authService.getProfile().subscribe(
       (profile: Profile) => {
-        console.log(profile);
         this._id = profile._id;
         this.username = profile.username;
         this.email = profile.email;
-        this.playlists = [];
+        this.playlists = profile.playlists;
+        console.log(profile._id);
       },
       err => {
         console.log(err);
@@ -46,5 +53,26 @@ export class ProfileComponent implements OnInit {
         return false;
       }
     );
+  }
+
+  // gets called on click when a user deletes a song. deletes based on song id.
+  deleteSong(songId, spotifyId) {
+    const userId = localStorage.getItem('_id');
+    this.songsService.deleteSong(userId, songId).subscribe((result: any) => {
+      console.log('asdf', result);
+      if (result.success) {
+        const newPlaylist = this.playlists.filter(a => {
+          console.log(a.spotifyId !== spotifyId);
+          // a.spotifyId !== spotifyId;
+        });
+        // this.playlists = newPlaylist;
+        this.playlists.forEach((a, i) => {
+          if (a.spotifyId === spotifyId) {
+            this.playlists.splice(i, 1);
+          }
+        });
+      }
+      console.log(songId, spotifyId);
+    });
   }
 }

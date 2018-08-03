@@ -77,29 +77,54 @@ router.get(
   '/profile',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
+    // console.log('req.user', req.user);
     res.json(req.user);
   }
 );
+
+router.delete('/delete-song/:userId/:songId', (req, res) => {
+  console.log(req.params);
+  User.update(
+    { _id: req.params.userId },
+    { $pull: { savedSongs: { $in: [req.params.songId] } } }
+  )
+    .then(result => {
+      res.json({ success: 'Song removed' });
+    })
+    .catch(err => {
+      res.json({ error: 'Failed to remove song' });
+    });
+});
+
+//TODO: refactor to Song.update with an upsert property. This will reduce a ton of code
 
 router.post('/save', (req, res) => {
   const { userId, song } = req.body;
   // const SongToSave = new Song(song);
 
   // checks if the song has been saved by anyone or not
+  // the Song collection stores 1 song per spotifyId, saved by anyone
   Song.find({ spotifyId: song.spotifyId })
     .then(result => {
       if (result.length) {
+        // adds the objectId to the user songsArray to associate songs to users
         User.update(
           { _id: userId },
-          { $addToSet: { savedSongs: result._id } },
+          { $addToSet: { savedSongs: result[0]._id } },
           { new: true }
         )
+          // if nModifed is 1, then the song was added to the user. if it was 0, then the song was already saved to the user
           .then(savedRes => {
             if (savedRes.nModified === 1) res.json({ success: 'Song saved' });
             else res.json({ success: 'Song already saved' });
           })
-          .catch(err => res.json({ error: err }));
+          // error handling if unable to save
+          .catch(err => {
+            console.log('user-routes 102:', error);
+            res.json({ error: 'An error occured' });
+          });
       } else {
+        // if the song is not saved, then
         Song.create(song)
           .then(result => {
             User.update(
@@ -112,12 +137,21 @@ router.post('/save', (req, res) => {
                   res.json({ success: 'Song saved' });
                 else res.json({ success: 'Song already saved' });
               })
-              .catch(err => res.json({ error: err }));
+              .catch(err => {
+                console.log('user-routes 116:', err);
+                res.json({ error: 'An error occured' });
+              });
           })
-          .catch(err => res.json({ error: err }));
+          .catch(err => {
+            console.log('user-routes 120:', err);
+            res.json({ error: 'An error occured' });
+          });
       }
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log('user-routes 127:', err);
+      res.json({ error: 'An error occured' });
+    });
 });
 
 module.exports = router;

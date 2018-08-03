@@ -9,22 +9,21 @@ module.exports = function(passport) {
   passport.use(
     new JwtStrategy(opts, (jwt_payload, done) => {
       // console.log(jwt_payload);
-      User.getUserById(jwt_payload.data._id, (err, user) => {
-        if (err) {
-          return done(err, false);
-        }
 
-        if (user) {
+      User.find({ _id: jwt_payload.data._id })
+        .populate('savedSongs')
+        .then(user => {
           const userObj = {
-            _id: user._id,
-            username: user.username,
-            email: user.email
+            _id: user[0]._id,
+            username: user[0].username,
+            email: user[0].email,
+            playlists: user[0].savedSongs
           };
           return done(null, userObj);
-        } else {
+        })
+        .catch(() => {
           return done(null, false);
-        }
-      });
+        });
     })
   );
 };

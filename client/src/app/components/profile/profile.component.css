@@ -1,20 +1,22 @@
-nav {
-  background: #2d2e2e;
+.artist-thumb {
+  width: 130px;
   height: 100%;
+  /* float: left; */
+  margin-right: 20px;
 }
 
-nav ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+.img-div {
+  margin-bottom: 15px;
 }
 
-li a {
-  color: #fff;
-  padding: 20px;
-  display: block;
+.saved-song {
+  background-color: #303030;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  padding: 10px 0;
+  margin-bottom: 25px;
 }
 
-.active {
-  background-color: #00a8ff;
+.delete-song {
+  cursor: pointer;
 }

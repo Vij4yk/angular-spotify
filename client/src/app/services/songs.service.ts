@@ -13,4 +13,10 @@ export class SongsService {
       .post('http://localhost:8080/users/save', { song, userId })
       .pipe(map(res => res));
   }
+
+  deleteSong(userId: string, songId: string) {
+    return this.http
+      .delete(`http://localhost:8080/users/delete-song/${userId}/${songId}`)
+      .pipe(map(res => res));
+  }
 }

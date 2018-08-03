@@ -40,7 +40,11 @@ export class AuthService {
     headers.append('Content-Type', 'application/json');
     return this.http
       .get('http://localhost:8080/users/profile', { headers: headers })
-      .pipe(map(res => res));
+      .pipe(
+        map(res => {
+          return res;
+        })
+      );
   }
 
   // Sets auth data at login

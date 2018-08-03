@@ -10,6 +10,11 @@ class Profile {
   email: string;
 }
 
+class res {
+  success: string;
+  error: string;
+}
+
 @Component({
   selector: 'app-album',
   templateUrl: './album.component.html',
@@ -18,6 +23,10 @@ class Profile {
 export class AlbumComponent implements OnInit {
   album = null;
   error = false;
+  // saveIndex tracks which song was saved to display the result for the right song
+  saveIndex: number;
+  saveSucc: string;
+  saveErr: string;
 
   constructor(
     private authService: AuthService,
@@ -30,7 +39,6 @@ export class AlbumComponent implements OnInit {
     // loads all the songs for a specified album, based on the album id which is in the route
     this._route.params.subscribe(params => {
       this._spotifyService.getAlbum(params.id).subscribe(album => {
-        console.log(album);
         this.album = album;
       });
     });
@@ -40,17 +48,22 @@ export class AlbumComponent implements OnInit {
         this.error = false;
       },
       err => {
+        // this prevents the save button from showing if a user isn't authed
         this.error = true;
       }
     );
   }
 
-  getSongId(spotifyId, name, artist, preview, img) {
+  getSongId(buttonIndex, spotifyId, name, artist, preview, img) {
+    // buttonIndex is used to track which song was saved when
+    // displaying the result message to the user
+    this.saveIndex = buttonIndex;
     const song = { spotifyId, name, artist, preview, img };
     const userId = localStorage.getItem('_id');
-    console.log(song);
-    this.songsService.saveSong(song, userId).subscribe(res => {
-      console.log(res);
+    this.songsService.saveSong(song, userId).subscribe((res: res) => {
+      return res.success
+        ? (this.saveSucc = res.success)
+        : (this.saveErr = res.error);
     });
   }
 }
